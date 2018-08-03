@@ -5,15 +5,15 @@ import akka.actor.{Actor, ActorLogging, ActorRef, Props, Terminated}
 import scala.concurrent.duration.FiniteDuration
 
 object DeviceGroupQuery {
-
-  def pops(
-            actorToDeviceId: Map[ActorRef, String],
-            requestId: Long,
-            requester: ActorRef,
-            timeout: FiniteDuration
-          ): Props = Props(new DeviceGroupQuery(actorToDeviceId, requestId, requester, timeout))
+  def props(
+             actorToDeviceId: Map[ActorRef, String],
+             requestId: Long,
+             requester: ActorRef,
+             timeout: FiniteDuration
+           ): Props = Props(new DeviceGroupQuery(actorToDeviceId, requestId, requester, timeout))
 
   case object CollectionTimeout
+
 }
 
 class DeviceGroupQuery(
@@ -73,10 +73,10 @@ class DeviceGroupQuery(
   }
 
   def receivedResponse(
-                        deviceActor:  ActorRef,
-                        reading:      DeviceGroup.TemperatureReading,
+                        deviceActor: ActorRef,
+                        reading: TemperatureReading,
                         stillWaiting: Set[ActorRef],
-                        repliesSoFar: Map[String, DeviceGroup.TemperatureReading]
+                        repliesSoFar: Map[String, TemperatureReading]
                       ): Unit = {
     context.unwatch(deviceActor)
     val deviceId = actorToDeviceId(deviceActor)
@@ -84,7 +84,7 @@ class DeviceGroupQuery(
 
     val newRepliesSoFar = repliesSoFar + (deviceId -> reading)
     if (newStillWaiting.isEmpty) {
-      requester ! DeviceGroup.RespondAllTemperatures(requestId, newRepliesSoFar)
+      requester ! RespondAllTemperatures(requestId, newRepliesSoFar)
       context.stop(self)
     } else {
       context.become(waitingForReplies(newRepliesSoFar, newStillWaiting))

@@ -4,8 +4,8 @@ import akka.actor.ActorSystem
 import akka.testkit.{TestKit, TestProbe}
 import org.scalatest.{BeforeAndAfterAll, Matchers, WordSpecLike}
 
-import scala.language.postfixOps
 import scala.concurrent.duration._
+import scala.language.postfixOps
 
 class DeviceSpec(_system: ActorSystem)
   extends TestKit(_system)
